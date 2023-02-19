@@ -1,4 +1,12 @@
-namespace MyFactory {
+// Source: https://github.com/puggan/tsx/blob/main/jsx.ts & https://www.meziantou.net/write-your-own-dom-element-factory-for-typescript.htm
+namespace JSX {
+    export type Element = HTMLElement;
+    export interface AttributeCollection {
+        [name: string]: string | boolean | EventListenerOrEventListenerObject;
+    }
+}
+
+namespace JsxFactory {
     const Fragment = "<></>";
 
     export function createElement(tagName: string, attributes: JSX.AttributeCollection | null, ...children: any[]): Element | DocumentFragment {
@@ -11,18 +19,24 @@ namespace MyFactory {
             for (const key of Object.keys(attributes)) {
                 const attributeValue = attributes[key];
 
-                if (key === "className") { // JSX does not allow class as a valid name
-                    element.setAttribute("class", attributeValue);
-                } else if (key.startsWith("on") && typeof attributes[key] === "function") {
-                    element.addEventListener(key.substring(2), attributeValue);
-                } else {
-                    // <input disable />      { disable: true }
-                    // <input type="text" />  { type: "text"}
-                    if (typeof attributeValue === "boolean" && attributeValue) {
+                if (typeof attributeValue === 'boolean') {
+                    if (attributeValue) {
                         element.setAttribute(key, "");
-                    } else {
-                        element.setAttribute(key, attributeValue);
                     }
+                    continue;
+                }
+
+                if (typeof attributeValue == 'string') {
+                    if (key === "className") { // JSX does not allow class as a valid name
+                        element.setAttribute("class", attributeValue);
+                        continue;
+                    }
+                    element.setAttribute(key, attributeValue);
+                    continue;
+                }
+
+                if (key.startsWith("on") && typeof attributes[key] === "function") {
+                    element.addEventListener(key.substring(2), attributeValue);
                 }
             }
         }
@@ -34,7 +48,7 @@ namespace MyFactory {
         return element;
     }
 
-    function appendChild(parent: Node, child: any) {
+    export function appendChild(parent: Node, child: any) {
         if (typeof child === "undefined" || child === null) {
             return;
         }
