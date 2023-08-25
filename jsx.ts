@@ -2,7 +2,7 @@
 namespace JSX {
     export type Element = HTMLElement;
     export interface AttributeCollection {
-        [name: string]: string | boolean | EventListenerOrEventListenerObject;
+        [name: string]: string | boolean | string[] | EventListenerOrEventListenerObject;
     }
 }
 
@@ -32,6 +32,15 @@ namespace JsxFactory {
                         continue;
                     }
                     element.setAttribute(key, attributeValue);
+                    continue;
+                }
+
+                if (typeof attributeValue == 'object' && Array.isArray(attributeValue)) {
+                    if (key === "className") { // JSX does not allow class as a valid name
+                        element.setAttribute("class", attributeValue.join(' '));
+                        continue;
+                    }
+                    element.setAttribute(key, attributeValue.join(' '));
                     continue;
                 }
 
