@@ -2,7 +2,7 @@
 namespace JSX {
     export type Element = HTMLElement;
     export interface AttributeCollection {
-        [name: string]: string | boolean | string[] | EventListenerOrEventListenerObject;
+        [name: string]: string | number | boolean | string[] | EventListenerOrEventListenerObject;
     }
 }
 
@@ -32,6 +32,11 @@ namespace JsxFactory {
                         continue;
                     }
                     element.setAttribute(key, attributeValue);
+                    continue;
+                }
+
+                if (typeof attributeValue == 'number') {
+                    element.setAttribute(key, '' + attributeValue);
                     continue;
                 }
 
