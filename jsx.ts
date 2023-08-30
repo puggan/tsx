@@ -27,7 +27,7 @@ namespace JsxFactory {
                 }
 
                 if (typeof attributeValue == 'string') {
-                    if (key === "className") { // JSX does not allow class as a valid name
+                    if (key === "className" || key === "class") {
                         element.setAttribute("class", attributeValue);
                         continue;
                     }
@@ -40,13 +40,21 @@ namespace JsxFactory {
                     continue;
                 }
 
-                if (typeof attributeValue == 'object' && Array.isArray(attributeValue)) {
-                    if (key === "className") { // JSX does not allow class as a valid name
-                        element.setAttribute("class", attributeValue.join(' '));
+                if (typeof attributeValue == 'object') {
+                    if (Array.isArray(attributeValue)) {
+                        if (key === "className" || key === "class") {
+                            element.setAttribute("class", attributeValue.join(' '));
+                            continue;
+                        }
+                        element.setAttribute(key, attributeValue.join(' '));
                         continue;
+                    } else if (key === "className" || key === "class") {
+                        for (const classKey of Object.keys(attributeValue)) {
+                            if (attributeValue[classKey]) {
+                                element.classList.toggle(classKey, attributeValue[classKey]);
+                            }
+                        }
                     }
-                    element.setAttribute(key, attributeValue.join(' '));
-                    continue;
                 }
 
                 if (key.startsWith("on") && typeof attributes[key] === "function") {
