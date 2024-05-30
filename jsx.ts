@@ -7,11 +7,15 @@ namespace JSX {
 }
 
 namespace JsxFactory {
-    const Fragment = "<></>";
+    export const Fragment = "<></>";
 
     export function createElement(tagName: string, attributes: JSX.AttributeCollection | null, ...children: any[]): Element | DocumentFragment {
         if (tagName === Fragment) {
-            return document.createDocumentFragment();
+            const fragment = document.createDocumentFragment();
+            for (const child of children) {
+                appendChild(fragment, child);
+            }
+            return fragment;
         }
 
         const element = document.createElement(tagName);
@@ -81,6 +85,10 @@ namespace JsxFactory {
             }
         } else if (typeof child === "string") {
             parent.appendChild(document.createTextNode(child));
+        } else if (child instanceof DocumentFragment) {
+            while (child.firstChild) {
+                parent.appendChild(child.firstChild)
+            }
         } else if (child instanceof Node) {
             parent.appendChild(child);
         } else if (typeof child === "boolean") {
